@@ -12,7 +12,7 @@ declare(strict_types=1);
 use Adx\MarketingMcp\Config\ConfigurationException;
 use Adx\MarketingMcp\Kernel;
 use Nyholm\Psr7\Factory\Psr17Factory;
-use Nyholm\Psr7Server\ServerRequestCreator;
+use Adx\MarketingMcp\MCP\ServerRequestFactory;
 use Psr\Http\Message\ResponseInterface;
 
 $projectRoot = dirname(__DIR__);
@@ -68,7 +68,8 @@ try {
 }
 
 try {
-    $request = (new ServerRequestCreator($factory, $factory, $factory, $factory))->fromGlobals();
+    // Not ServerRequestCreator::fromGlobals() directly: it duplicates the Host header (see ServerRequestFactory).
+    $request = ServerRequestFactory::fromGlobals();
     $response = $kernel->httpApplication()->handle($request);
 } catch (\Throwable $e) {
     // Building the application can fail too (e.g. an invalid auth setting). Never show a blank page or a trace.
